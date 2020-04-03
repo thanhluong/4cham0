@@ -139,6 +139,12 @@ get_over_word = (word) => {
     return "none";
 };
 
+remove_over_chr = (chr) => {
+    if(obj_has_value(over_moon, chr)) return obj_get_key(over_moon, chr);
+    if(obj_has_value(over_cap, chr)) return obj_get_key(over_cap, chr);
+    return chr;
+};
+
 update_first_consonant = (word) => {
     /*
         Rules:
@@ -150,7 +156,7 @@ update_first_consonant = (word) => {
     if(n > 3){
         // 3-char-consonant
         let consonant = word[0] + word[1] + word[2];
-        let suffix = word.substr(3, n);
+        let suffix = word.slice(3);
         if(consonant == "ngh"){
             consonant = "w";
             let new_word = consonant + suffix;
@@ -160,7 +166,7 @@ update_first_consonant = (word) => {
     if(n > 2){
         // 2-char-consonant
         let consonant = word[0] + word[1];
-        let suffix = word.substr(2, n);
+        let suffix = word.slice(2);
         if(consonant == "ph") consonant = "f";
         if(consonant == "qu") consonant = "q";
         if(consonant == "kh") consonant = "k";
@@ -176,7 +182,7 @@ update_first_consonant = (word) => {
         // 1-char-consonant
         let consonant = word[0];
         let old_consonant = word[0];
-        let suffix = word.substr(1, n);
+        let suffix = word.slice(1);
         if(consonant == "k") consonant = "c";
         if(consonant == "d") consonant = "z";
         if(consonant == "đ") consonant = "d";
@@ -205,9 +211,61 @@ update_final_consonant = (word) => {
     return new_word;
 };
 
+is_alpha_chr = (chr) => {
+    if(chr == "đ") return true;
+    chr = remove_tone_chr(chr);
+    chr = remove_over_chr(chr);
+    chr = chr.toLowerCase();
+    is_alpha = (chr.match(/[a-z]/) != null);
+    return is_alpha;
+};
+
+is_upper = (chr) => {
+    chr_capitalized = chr.toUpperCase();
+    return (chr == chr_capitalized);
+};
+
+convert_cvnss = (word) => {
+    var flag_upper = is_upper(word[0]);
+    word = word.toLowerCase();
+
+    word = update_first_consonant(word); // replace first consonant
+    word = update_final_consonant(word); // replace final consonant
+
+    if(flag_upper){
+        // capitalize the word
+        word = word[0].toUpperCase() + word.slice(1);
+    }
+    return word;
+};
+
 convert_word = (word) => {
     if(word == "") return "";
-    var new_word = word;
+    var n = word.length;
+    var left_part = "";
+    var right_part = "";
+    var start_pos = -1;
+    var end_pos;
+
+    for(let i = 0; i < n; i++){
+        if(is_alpha_chr(word[i])){
+            start_pos = i;
+            break;
+        }
+        left_part += word[i];
+    };
+    if(start_pos == -1) return word; // no alpha char
+    for(let i = n-1; i >= 0; i--){
+        if(is_alpha_chr(word[i])){
+            end_pos = i+1;
+            break;
+        }
+        right_part += word[i];
+    }
+    text_part = word.substr(start_pos, end_pos);
+    text_part = convert_cvnss(text_part);
+
+    var new_word = left_part + text_part + right_part;
     return new_word;
 };
 
