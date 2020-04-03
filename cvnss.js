@@ -113,6 +113,32 @@ rhymes_new = [
     "y", "i"
 ];
 
+tone_id = {
+    "sharp": 0,
+    "hanging": 1,
+    "asking": 2,
+    "tumbling": 3,
+    "heavy": 4 
+};
+
+over_id = {
+    "none": 0,
+    "moon": 1,
+    "cap": 2
+};
+
+tone_char = [
+    ["j", "l", "z", "s", "r"],
+    ["x", "k", "v", "w", "h"],
+    ["b", "d", "q", "g", "f"]
+];
+
+over_char = {
+    "moon": "o",
+    "cap": "y",
+    "none": "p"
+};
+
 obj_has_value = (obj, v) => {
     return (Object.values(obj).indexOf(v) > -1);
 };
@@ -176,6 +202,15 @@ remove_over_chr = (chr) => {
     if(obj_has_value(over_moon, chr)) return obj_get_key(over_moon, chr);
     if(obj_has_value(over_cap, chr)) return obj_get_key(over_cap, chr);
     return chr;
+};
+
+remove_over_word = (word) => {
+    var new_word = "";
+    for(const c of word){
+        let new_c = remove_over_chr(c);
+        new_word += new_c;
+    };
+    return new_word;    
 };
 
 update_first_consonant = (word) => {
@@ -247,9 +282,9 @@ update_final_consonant = (word) => {
 is_alpha_chr = (chr) => {
     if(chr == "đ") return true;
     if(chr == "Đ") return true;
+    chr = chr.toLowerCase();
     chr = remove_tone_chr(chr);
     chr = remove_over_chr(chr);
-    chr = chr.toLowerCase();
     is_alpha = (chr.match(/[a-z]/) != null);
     return is_alpha;
 };
@@ -263,10 +298,7 @@ convert_cvnss = (word) => {
     var flag_upper = is_upper(word[0]);
     word = word.toLowerCase();
 
-    word = update_first_consonant(word); // replace first consonant
-    word = update_final_consonant(word); // replace final consonant
-
-    tone = get_tone_word(word);
+    var tone = get_tone_word(word);
     if(tone == "sharp"){
         // 1st rule
         if(word.endsWith("c") 
@@ -277,6 +309,10 @@ convert_cvnss = (word) => {
     }
     word = remove_tone_word(word);
 
+    word = update_first_consonant(word); // replace first consonant
+    word = update_final_consonant(word); // replace final consonant
+
+    // replace rhyme
     m = rhymes_old.length;
     for(let i = 0; i < m; i++){
         if(word.match(rhymes_old[i])){
@@ -285,10 +321,23 @@ convert_cvnss = (word) => {
         }
     }
 
+    // replace tone and over
+    var over = get_over_word(word);
+    word = remove_over_word(word);
+    if(tone != "level"){
+        let tid = tone_id[tone];
+        let oid = over_id[over];
+        word += tone_char[oid][tid];
+    }
+    else{
+        word += over_char[over];
+    } 
+
     if(flag_upper){
         // capitalize the word
         word = word[0].toUpperCase() + word.slice(1);
     }
+
     return word;
 };
 
@@ -325,7 +374,8 @@ convert_word = (word) => {
 convert_text = (given_text) => {
     var new_text = "";
     given_text = given_text.split(" ");
-    for(const w of given_text)
+    for(const w of given_text){
         new_text += convert_word(w) + " ";
+    }
     return new_text;
 };
