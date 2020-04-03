@@ -9,7 +9,8 @@ tone_hanging = {
     "ô": "ồ",
     "ơ": "ờ",
     "u": "ù",
-    "ư": "ừ"
+    "ư": "ừ",
+    "y": "ỳ"
 };
 
 tone_sharp = {
@@ -23,7 +24,8 @@ tone_sharp = {
     "ô": "ố",
     "ơ": "ớ",
     "u": "ú",
-    "ư": "ứ"
+    "ư": "ứ",
+    "y": "ý"
 };
 
 tone_asking = {
@@ -37,7 +39,8 @@ tone_asking = {
     "ô": "ổ",
     "ơ": "ở",
     "u": "ủ",
-    "ư": "ử"
+    "ư": "ử",
+    "y": "ỷ"
 };
 
 tone_tumbling = {
@@ -51,7 +54,8 @@ tone_tumbling = {
     "ô": "ỗ",
     "ơ": "ỡ",
     "u": "ũ",
-    "ư": "ữ"
+    "ư": "ữ",
+    "y": "ỹ"
 };
 
 tone_heavy = {
@@ -65,7 +69,8 @@ tone_heavy = {
     "ô": "ộ",
     "ơ": "ợ",
     "u": "ụ",
-    "ư": "ự"
+    "ư": "ự",
+    "y": "ỵ"
 };
 
 over_moon = {
@@ -79,6 +84,34 @@ over_cap = {
     "e": "ê",
     "o": "ô"
 };
+
+rhymes_old = [
+    "uyêt", "uyên",
+    "iêt", "iêp", "iêc", "iên", "iêm", "iêng", "iêu",
+    "yêt", "yên", "yêm", "yêng", "yêu",
+    "uôt", "uôc", "uôn", "uôm", "uông", "uôi",
+    "ươt", "ươp", "ươc", "ươn", "ươm", "ương", "ươu", "ươi",
+    "uât", "uân", "uâng", "uây",
+    "uơt", "uơn",
+    "oăt", "oăc", "oăn", "oăm", "oăng",
+    "oet", "oen", "oem", "oeo",
+    "oat", "oap", "oac", "oan", "oam", "oang", "oao", "oai", "oay",
+    "uy", "y"
+];
+
+rhymes_new = [
+    "yd", "yl",
+    "id", "if", "is", "il", "iv", "iz", "iw",
+    "id", "il", "iv", "iz", "iw",
+    "ud", "us", "ul", "uv", "uz", "uj",
+    "ưd", "ưf", "ưs", "ưl", "ưv", "ưz", "ưw", "ưj",
+    "âd", "âl", "âz", "âj",
+    "ơd", "ơl",
+    "ăd", "ăs", "ăl", "ăv", "ăz",
+    "ed", "el", "ev", "ew",
+    "od", "of", "os", "ol", "ov", "oz", "ow", "oj", "aj",
+    "y", "i"
+];
 
 obj_has_value = (obj, v) => {
     return (Object.values(obj).indexOf(v) > -1);
@@ -213,6 +246,7 @@ update_final_consonant = (word) => {
 
 is_alpha_chr = (chr) => {
     if(chr == "đ") return true;
+    if(chr == "Đ") return true;
     chr = remove_tone_chr(chr);
     chr = remove_over_chr(chr);
     chr = chr.toLowerCase();
@@ -231,6 +265,25 @@ convert_cvnss = (word) => {
 
     word = update_first_consonant(word); // replace first consonant
     word = update_final_consonant(word); // replace final consonant
+
+    tone = get_tone_word(word);
+    if(tone == "sharp"){
+        // 1st rule
+        if(word.endsWith("c") 
+            || word.endsWith("p") 
+            || word.endsWith("t")
+            || word.endsWith("ch"))
+            tone = "level";
+    }
+    word = remove_tone_word(word);
+
+    m = rhymes_old.length;
+    for(let i = 0; i < m; i++){
+        if(word.match(rhymes_old[i])){
+            word = word.replace(rhymes_old[i], rhymes_new[i])
+            break;
+        }
+    }
 
     if(flag_upper){
         // capitalize the word
