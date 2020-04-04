@@ -239,6 +239,7 @@ update_first_consonant = (word) => {
         if(consonant == "qu") consonant = "q";
         if(consonant == "kh") consonant = "k";
         if(consonant == "gi") consonant = "j";
+        if(consonant == "gh") consonant = "g";
         if(consonant == "ng") consonant = "w";
         if(consonant.length == 1){
             // consonant has been updated
