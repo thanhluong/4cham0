@@ -295,6 +295,10 @@ is_upper = (chr) => {
     return (chr == chr_capitalized);
 };
 
+reverse_str = (str) => {
+    return str.split("").reverse().join("");
+};
+
 convert_cvnss = (word) => {
     var flag_upper = is_upper(word[0]);
     word = word.toLowerCase();
@@ -365,6 +369,7 @@ convert_word = (word) => {
         }
         right_part += word[i];
     }
+    right_part = reverse_str(right_part);
     text_part = word.substr(start_pos, end_pos);
     text_part = convert_cvnss(text_part);
 
