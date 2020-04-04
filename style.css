@@ -2,6 +2,11 @@ h4{
     margin-left: 5pt;
 }
 
+textarea{
+    font-size: 25pt !important;
+    resize: none;
+}
+
 .translate_div{
     margin-top: 30pt;
 }
