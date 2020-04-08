@@ -304,6 +304,8 @@ convert_cvnss = (word) => {
     word = word.toLowerCase();
 
     var tone = get_tone_word(word);
+    var over = get_over_word(word);
+
     if(tone == "sharp"){
         // 1st rule
         if(word.endsWith("c") 
@@ -327,7 +329,6 @@ convert_cvnss = (word) => {
     }
 
     // replace tone and over
-    var over = get_over_word(word);
     word = remove_over_word(word);
     if(tone != "level"){
         let tid = tone_id[tone];
